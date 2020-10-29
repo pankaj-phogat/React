@@ -4,7 +4,7 @@ import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 import { LocalForm, Control, Errors } from 'react-redux-form';
 import { Link } from 'react-router-dom';
 import { Label, Row } from 'reactstrap';
-
+import { Loading } from './LoadingComponent';
 
 const required= (val) => val && val.length;
 const validRating=(val) => !(val) || (Number(val)>=1 && Number(val)<=5); 
@@ -24,7 +24,8 @@ class CommentForm extends Component{
 		});
 	}
 	handleSubmit(values){
-		alert(JSON.stringify(values));
+		this.toggleModal();
+		this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
 	}
 
 	render(){
@@ -51,11 +52,11 @@ class CommentForm extends Component{
 											} />
 								</Row>
 								<Row className="form-group">
-									<Label for="name">Your Name</Label>
-									<Control.text model=".name" name="name" id="name"  
+									<Label for="author">Your Name</Label>
+									<Control.text model=".author" name="author" id="author"  
 										className="form-control"
 										validators={{required, minLength: minLength(3),maxLength: maxLength(15)}} />
-									<Errors model=".name" className='text-danger' show="touched" messages={
+									<Errors model=".author" className='text-danger' show="touched" messages={
 											{required: 'required', 
 											minLength:'must be atleast 3 characters',
 											maxLength:'must be less than 15 characters'}
@@ -103,7 +104,7 @@ class CommentForm extends Component{
 			);
 		}
 	}
-	function RenderComments({comments}){
+	function RenderComments({comments, addComment, dishId}){
 		if(comments!=null){
 			return(
 			
@@ -122,7 +123,7 @@ class CommentForm extends Component{
 							})
 						}
 					</ul>
-					<CommentForm />
+					<CommentForm dishId={dishId} addComment={addComment} />
 				</div>
 			
 			);
@@ -135,26 +136,47 @@ class CommentForm extends Component{
 	}
 
 	const DishDetail= (props) => {
-		return(
-			<div className="container">	
-				<div className="row">
-					<Breadcrumb>
-							<BreadcrumbItem>
-								<Link to="/menu">Menu</Link>
-							</BreadcrumbItem>
-							<BreadcrumbItem active>{props.dish.name}</BreadcrumbItem>
-						</Breadcrumb>	
-					<div className="col-12">
-							<h3>{props.dish.name}</h3>
-							<hr />
-						</div>	
+		if(props.isLoading){
+			return (
+				<div className="container">
+					<div className="row">
+						<Loading />
+					</div>
 				</div>
-				<div className="row">
-					<RenderDish dish={props.dish} />
-					<RenderComments comments={props.comments} />
+			);
+		}
+		else if(props.errmsg){
+			return (
+				<div className="container">
+					<div className="row">
+						<h4>{props.errmsg} </h4>
+					</div>
 				</div>
-			</div>
-		);
+			);
+		}
+		if(props.dish!=null){
+			return(
+				<div className="container">	
+					<div className="row">
+						<Breadcrumb>
+								<BreadcrumbItem>
+									<Link to="/menu">Menu</Link>
+								</BreadcrumbItem>
+								<BreadcrumbItem active>{props.dish.name}</BreadcrumbItem>
+							</Breadcrumb>	
+						<div className="col-12">
+								<h3>{props.dish.name}</h3>
+								<hr />
+							</div>	
+					</div>
+					<div className="row">
+						<RenderDish dish={props.dish} />
+						<RenderComments comments={props.comments} addComment={props.addComment}
+							dishId={props.dish.id} />
+					</div>
+				</div>
+			);
+		}
 	}
 
 
