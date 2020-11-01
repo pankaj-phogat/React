@@ -5,6 +5,7 @@ import { LocalForm, Control, Errors } from 'react-redux-form';
 import { Link } from 'react-router-dom';
 import { Label, Row } from 'reactstrap';
 import { Loading } from './LoadingComponent';
+import { baseUrl } from '../shared/baseUrl';
 
 const required= (val) => val && val.length;
 const validRating=(val) => !(val) || (Number(val)>=1 && Number(val)<=5); 
@@ -89,7 +90,7 @@ class CommentForm extends Component{
 			return(
 				<div className="col-md-5 m-1">
 					<Card>
-						<CardImg top width="100%" src={dish.image} alt={dish.name} />
+						<CardImg top width="100%" src={baseUrl+dish.image} alt={dish.name} />
 						<CardBody>
 							<CardTitle>{dish.name}</CardTitle>
 							<CardText>{dish.description}</CardText>
