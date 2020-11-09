@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { Label, Row } from 'reactstrap';
 import { Loading } from './LoadingComponent';
 import { baseUrl } from '../shared/baseUrl';
+import { FadeTransform, Fade, Stagger } from 'react-animation-components';
 
 const required= (val) => val && val.length;
 const validRating=(val) => !(val) || (Number(val)>=1 && Number(val)<=5); 
@@ -26,7 +27,7 @@ class CommentForm extends Component{
 	}
 	handleSubmit(values){
 		this.toggleModal();
-		this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
+		this.props.postComment(this.props.dishId, values.rating, values.author, values.comment);
 	}
 
 	render(){
@@ -89,13 +90,18 @@ class CommentForm extends Component{
 		if(dish!=null){
 			return(
 				<div className="col-md-5 m-1">
-					<Card>
-						<CardImg top width="100%" src={baseUrl+dish.image} alt={dish.name} />
-						<CardBody>
-							<CardTitle>{dish.name}</CardTitle>
-							<CardText>{dish.description}</CardText>
-						</CardBody>
-					</Card>
+					<FadeTransform in 
+						transformProps={{
+							exitTransform: 'scale(0.5) translateY(-50%)'
+						}}>
+						<Card>
+							<CardImg top width="100%" src={baseUrl+dish.image} alt={dish.name} />
+							<CardBody>
+								<CardTitle>{dish.name}</CardTitle>
+								<CardText>{dish.description}</CardText>
+							</CardBody>
+						</Card>
+					</FadeTransform>
 				</div>
 			);
 		}
@@ -105,26 +111,31 @@ class CommentForm extends Component{
 			);
 		}
 	}
-	function RenderComments({comments, addComment, dishId}){
+	function RenderComments({comments, postComment, dishId}){
 		if(comments!=null){
 			return(
 			
 				<div className="col-md-5 m-1">
 					<h4 className="text-left">Comments</h4>
 					<ul className="list-unstyled text-left">
-						{
-							comments.map((review)=>{
-								return(
-									<li key={review.id}>
-										<p>{review.comment}</p>
-										<p>--<em>{review.author}</em> &nbsp; 
-										{new Intl.DateTimeFormat('en-US',{year:'numeric',month:'short',day:'2-digit'}).format(new Date(Date.parse(review.date)))} </p>
-									</li>
-								);
-							})
-						}
+						<Stagger in>
+							{
+								comments.map((review)=>{
+									var date=new Date(review.date);
+	   								date=date.toDateString();
+									return(
+										<Fade in>
+											<li key={review.id}>
+												<p>{review.comment}</p>
+												<p>--<em>{review.author}</em> &nbsp; {date}  </p>
+											</li>
+										</Fade>
+									);
+								})
+							}
+						</Stagger>
 					</ul>
-					<CommentForm dishId={dishId} addComment={addComment} />
+					<CommentForm dishId={dishId} postComment={postComment} />
 				</div>
 			
 			);
@@ -172,7 +183,7 @@ class CommentForm extends Component{
 					</div>
 					<div className="row">
 						<RenderDish dish={props.dish} />
-						<RenderComments comments={props.comments} addComment={props.addComment}
+						<RenderComments comments={props.comments} postComment={props.postComment}
 							dishId={props.dish.id} />
 					</div>
 				</div>
