@@ -2,7 +2,7 @@ Visit Application at : https://confusionpk.herokuapp.com/index.html
 
 *Initial loading may take some time because NodeJs server deployed at heroku sleeps after 30 minutes of inactivity
 
-Server for this Single Page application : https://github.com/pankaj-phogat/conFusionServer
+Server repository for this Single Page application : https://github.com/pankaj-phogat/conFusionServer
 
 
 
